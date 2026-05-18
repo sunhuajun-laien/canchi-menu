@@ -59,7 +59,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC"
 .acts .sv{background:#1a1a1a;color:#fff}
 </style>
 </head>
-<body>
+<body ontouchstart="">
 
 <div id="page_home">
   <h1>🥢 今晚吃什么</h1>
@@ -162,7 +162,7 @@ function renderList(){
 function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
 // ===== 事件委托 =====
-document.addEventListener('click', function(e){
+function _ga(el){if(!el)return'';var a=el.getAttribute('data-act');if(a)return a;return _ga(el.parentElement);}function _gc(el){if(!el)return'';var c=el.getAttribute('data-cat');if(c)return c;return _gc(el.parentElement);}document.addEventListener('touchend', function(e){
   var t = e.target;
   var act = t.getAttribute('data-act') || (t.closest && t.closest('[data-act]') && t.closest('[data-act]').getAttribute('data-act'));
   if(!act) return;
