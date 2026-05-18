@@ -3,287 +3,287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>聚餐菜单 · 今晚吃什么</title>
+<title>聚餐菜单</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}
 
 /* 首页 */
-#home{padding:50px 16px 20px}
-#home h1{font-size:26px;font-weight:700}
-#home p{font-size:13px;color:#999;margin:4px 0 18px}
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cat{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff;cursor:pointer}
-.cat:active{opacity:.85}
-.cat .i{font-size:34px;display:block;margin-bottom:8px}
-.cat .n{font-weight:600;font-size:16px}
-
-/* 分类颜色 */
+#page_home{padding:50px 16px 20px}
+#page_home h1{font-size:26px;font-weight:700}
+#page_home p{font-size:13px;color:#999;margin:4px 0 18px}
+.grid_h{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat_card{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff;cursor:pointer}
+.cat_card .ico{font-size:34px;display:block;margin-bottom:8px}
+.cat_card .nm{font-weight:600;font-size:16px}
 .c0{background:linear-gradient(135deg,#43b581,#2d8f63)}
 .c1{background:linear-gradient(135deg,#ff6b35,#e85d2c)}
 .c2{background:linear-gradient(135deg,#4a90d9,#357abd)}
 .c3{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}
 .c4{background:linear-gradient(135deg,#f4a261,#e8924a)}
 
-/* 底部按钮 */
-.bottom-bar{margin-top:20px;display:flex;gap:10px}
-.bottom-bar button{flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer}
-.btn-orange{background:#ff6b35;color:#fff}
-.btn-dark{background:#1a1a1a;color:#fff}
+.btns_h{margin-top:18px;display:flex;gap:10px}
+.btns_h button{flex:1;padding:13px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer}
+.btn_o{background:#ff6b35;color:#fff}
+.btn_d{background:#1a1a1a;color:#fff}
 
 /* 详情页 */
-#detail{display:none;padding:0 16px}
-.dh{padding:50px 0 14px;display:flex;align-items:center}
-.dh .bk{width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.dh .tt{flex:1;text-align:center;font-size:19px;font-weight:700}
-.dish-area{padding-bottom:20px}
+#page_detail{display:none;padding:0 16px}
+.hd{padding:50px 0 14px;display:flex;align-items:center}
+.hd .bk{width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hd .tl{flex:1;text-align:center;font-size:19px;font-weight:700}
+#list_area{padding-bottom:16px}
 
-/* 菜品卡片 */
-.dish-card{background:#fff;border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.dish-card .pic{width:68px;height:68px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#f0efed}
-.dish-card .pic img{width:100%;height:100%;object-fit:cover;display:block}
-.dish-card .info{flex:1;margin-left:12px}
-.dish-card .info .nm{font-size:15px;font-weight:600}
-.dish-card .info input{font-size:15px;font-weight:600;padding:4px 6px;border:1.5px dashed #ff6b35;border-radius:6px;outline:none;width:100%;background:#fffaf5}
+/* 菜品行 */
+.row{border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center}
+.row.has{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.row .pic{width:68px;height:68px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#f0efed;cursor:pointer}
+.row .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.row .inf{flex:1;margin-left:12px}
+.row .inf .tx{font-size:15px;font-weight:600}
+.row .inf .ed{display:none;font-size:15px;font-weight:600;padding:4px 6px;border:1.5px dashed #ff6b35;border-radius:6px;outline:none;width:100%;background:#fffaf5}
+.row.edit .inf .tx{display:none}
+.row.edit .inf .ed{display:block}
 
 /* 空位 */
-.empty-slot{background:#fff;border-radius:12px;margin-bottom:10px;padding:14px;border:2px dashed #ddd;text-align:center;color:#bbb;cursor:pointer;font-size:14px}
-.empty-slot:active{background:#f9f7f5;border-color:#ff6b35}
+.row.add{border:2px dashed #ddd;cursor:pointer;justify-content:center;padding:16px;color:#bbb;font-size:14px}
 
 /* 空状态 */
-.no-data{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}
+.empty_msg{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}
 
-/* 底部操作栏 */
-.action-bar{padding:10px 0 25px;display:flex;gap:10px}
-.action-bar button{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer}
-.btn-edit{background:#eee;color:#333}
-.btn-edit.on{background:#ff6b35;color:#fff}
-.btn-save-d{background:#1a1a1a;color:#fff}
+/* 底部操作 */
+.acts{padding:10px 0 25px;display:flex;gap:10px}
+.acts button{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer}
+.acts .eb{background:#eee;color:#333}
+.acts .eb.on{background:#ff6b35;color:#fff}
+.acts .sv{background:#1a1a1a;color:#fff}
 </style>
 </head>
 <body>
 
-<!-- 首页 -->
-<div id="home">
+<div id="page_home">
   <h1>🥢 今晚吃什么</h1>
   <p>点分类选菜 · 编辑后可保存分享</p>
-  <div class="home-grid" id="catList"></div>
-  <div class="bottom-bar">
-    <button class="btn-orange" id="editAllBtn">✏️ 编辑菜单</button>
-    <button class="btn-dark" id="exportBtn">📤 保存并分享</button>
+  <div class="grid_h" id="grid_home"></div>
+  <div class="btns_h">
+    <button class="btn_o" data-act="editAll">✏️ 编辑菜单</button>
+    <button class="btn_d" data-act="export">📤 保存并分享</button>
   </div>
 </div>
 
-<!-- 详情页 -->
-<div id="detail">
-  <div class="dh">
-    <button class="bk" id="backBtn">‹</button>
-    <div class="tt" id="detailTitle">凉菜</div>
+<div id="page_detail">
+  <div class="hd">
+    <button class="bk" data-act="back">‹</button>
+    <div class="tl" id="det_title">凉菜</div>
   </div>
-  <div class="dish-area" id="dishArea"></div>
-  <div class="action-bar">
-    <button class="btn-edit" id="editBtn">✏️ 编辑</button>
-    <button class="btn-save-d" id="saveBtn">💾 保存</button>
+  <div id="list_area"></div>
+  <div class="acts">
+    <button class="eb" data-act="toggleEdit">✏️ 编辑</button>
+    <button class="sv" data-act="save">💾 保存</button>
   </div>
 </div>
 
 <script>
+// CSS 里已加 cursor:pointer + 事件委托，解决微信浏览器点击问题
+
 var CATS = ['凉菜','热菜','汤','主食','点心'];
-var ICONS = ['🥗','🍲','🥣','🍚','🥟'];
-var COLORS = ['c0','c1','c2','c3','c4'];
-var PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8e6e3%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2236%22%3E🍽%3C/text%3E%3C/svg%3E';
+var ICOS = ['🥗','🍲','🥣','🍚','🥟'];
+var CLS = ['c0','c1','c2','c3','c4'];
+var PH = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8e6e3%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2236%22%3E🍽%3C/text%3E%3C/svg%3E';
 
-// 数据
-var data = {};
-for(var i=0;i<CATS.length;i++){
-  data[CATS[i]] = [];
-}
+var db = {};
+for(var i=0;i<CATS.length;i++) db[CATS[i]] = [];
+var cur = '';
+var ed = false;
 
-var currentCat = '';
-var editMode = false;
-
-// 首页
-function renderHome(){
-  var list = document.getElementById('catList');
-  list.innerHTML = '';
+function showHome(){
+  document.getElementById('page_home').style.display = 'block';
+  document.getElementById('page_detail').style.display = 'none';
+  var g = document.getElementById('grid_home');
+  g.innerHTML = '';
   for(var i=0;i<CATS.length;i++){
-    var c = CATS[i];
-    var count = data[c].length;
-    var div = document.createElement('div');
-    div.className = 'cat '+COLORS[i];
-    div.innerHTML = '<span class="i">'+ICONS[i]+'</span><div class="n">'+c+'</div><div style="font-size:12px;opacity:.7;margin-top:2px">'+count+'道菜</div>';
-    div.onclick = function(cat){ return function(){ openCat(cat); }; }(c);
-    list.appendChild(div);
+    var c = CATS[i], n = db[c].length;
+    var d = document.createElement('div');
+    d.className = 'cat_card '+CLS[i];
+    d.setAttribute('data-cat', c);
+    d.innerHTML = '<span class="ico">'+ICOS[i]+'</span><div class="nm">'+c+'</div><div style="font-size:12px;opacity:.7;margin-top:2px">'+n+'道菜</div>';
+    g.appendChild(d);
   }
 }
 
-// 打开分类
 function openCat(cat){
-  currentCat = cat;
-  editMode = false;
-  document.getElementById('detailTitle').innerHTML = cat;
-  document.getElementById('editBtn').innerHTML = '✏️ 编辑';
-  document.getElementById('editBtn').className = 'btn-edit';
-  document.getElementById('home').style.display = 'none';
-  document.getElementById('detail').style.display = 'block';
-  renderDishes();
+  cur = cat; ed = false;
+  document.getElementById('det_title').textContent = cat;
+  document.getElementById('page_home').style.display = 'none';
+  document.getElementById('page_detail').style.display = 'block';
+  var eb = document.querySelector('.acts .eb');
+  eb.textContent = '✏️ 编辑'; eb.className = 'eb';
+  renderList();
 }
 
-// 渲染菜品
-function renderDishes(){
-  var area = document.getElementById('dishArea');
-  var items = data[currentCat];
+function renderList(){
+  var area = document.getElementById('list_area');
+  var items = db[cur];
   area.innerHTML = '';
-
-  if(editMode){
-    // 编辑模式：显示全部 + 空位
+  
+  if(ed){
     for(var i=0;i<5;i++){
       if(i < items.length){
-        // 已有菜品
         var d = items[i];
-        var card = document.createElement('div');
-        card.className = 'dish-card';
-        card.innerHTML = '<div class="pic" style="cursor:pointer"><img src="'+d.img+'"></div><div class="info"><div class="nm" id="dnm_'+i+'" style="display:none">'+escHtml(d.name)+'</div><input id="dni_'+i+'" type="text" value="'+escHtml(d.name)+'" maxlength="20"></div>';
-        card.querySelector('.pic').onclick = function(idx){ return function(){ pickImage(idx); }; }(i);
-        area.appendChild(card);
+        var div = document.createElement('div');
+        div.className = 'row has edit';
+        div.setAttribute('data-idx', i);
+        div.innerHTML = '<div class="pic" data-act="pickImage" data-idx="'+i+'"><img src="'+d.img+'"></div><div class="inf"><div class="tx">'+esc(d.name)+'</div><input class="ed" type="text" value="'+esc(d.name)+'" maxlength="20"></div>';
+        area.appendChild(div);
       } else {
-        // 空位
-        var empty = document.createElement('div');
-        empty.className = 'empty-slot';
-        empty.innerHTML = '＋ 点击添加菜品';
-        empty.onclick = function(idx){ return function(){ addDish(idx); }; }(i);
-        area.appendChild(empty);
+        var div = document.createElement('div');
+        div.className = 'row add';
+        div.setAttribute('data-act', 'addDish');
+        div.setAttribute('data-idx', i);
+        div.textContent = '＋ 点击添加菜品';
+        area.appendChild(div);
       }
     }
   } else {
-    // 浏览模式
     if(items.length === 0){
-      area.innerHTML = '<div class="no-data">还没有菜品<br>点击下方「编辑」开始添加</div>';
+      area.innerHTML = '<div class="empty_msg">还没有菜品<br>点击下方「编辑」开始添加</div>';
       return;
     }
     for(var i=0;i<items.length;i++){
       var d = items[i];
-      var card = document.createElement('div');
-      card.className = 'dish-card';
-      card.innerHTML = '<div class="pic"><img src="'+d.img+'"></div><div class="info"><div class="nm">'+escHtml(d.name)+'</div></div>';
-      area.appendChild(card);
+      var div = document.createElement('div');
+      div.className = 'row has';
+      div.innerHTML = '<div class="pic"><img src="'+d.img+'"></div><div class="inf"><div class="tx">'+esc(d.name)+'</div></div>';
+      area.appendChild(div);
     }
   }
 }
 
-function escHtml(s){
-  var d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
-// 添加菜品
+// ===== 事件委托 =====
+document.addEventListener('click', function(e){
+  var t = e.target;
+  var act = t.getAttribute('data-act') || (t.closest && t.closest('[data-act]') && t.closest('[data-act]').getAttribute('data-act'));
+  if(!act) return;
+  
+  if(act === 'editAll'){
+    openCat(CATS[0]);
+    ed = true;
+    var eb = document.querySelector('.acts .eb');
+    eb.textContent = '✅ 完成编辑'; eb.className = 'eb on';
+    renderList();
+    return;
+  }
+  
+  if(act === 'export'){
+    doExport();
+    return;
+  }
+  
+  if(act === 'back'){
+    showHome();
+    return;
+  }
+  
+  if(act === 'toggleEdit'){
+    ed = !ed;
+    t.textContent = ed ? '✅ 完成编辑' : '✏️ 编辑';
+    t.className = ed ? 'eb on' : 'eb';
+    renderList();
+    return;
+  }
+  
+  if(act === 'save'){
+    for(var i=0;i<db[cur].length;i++){
+      var inp = document.querySelector('.row[data-idx="'+i+'"] .ed');
+      if(inp && inp.value.trim()) db[cur][i].name = inp.value.trim();
+    }
+    ed = false;
+    var eb = document.querySelector('.acts .eb');
+    eb.textContent = '✏️ 编辑'; eb.className = 'eb';
+    renderList();
+    showHome();
+    return;
+  }
+  
+  if(act === 'addDish'){
+    var idx = parseInt(t.getAttribute('data-idx'));
+    addDish(idx);
+    return;
+  }
+  
+  if(act === 'pickImage'){
+    var idx = parseInt(t.getAttribute('data-idx'));
+    pickImage(idx);
+    return;
+  }
+
+  // 分类卡片点击
+  var cat = t.getAttribute('data-cat') || (t.closest && t.closest('[data-cat]') && t.closest('[data-cat]').getAttribute('data-cat'));
+  if(cat && CATS.indexOf(cat) >= 0){
+    openCat(cat);
+  }
+}, false);
+
 function addDish(idx){
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = function(e){
-    var file = e.target.files[0];
-    if(!file) return;
-    compress(file, 600, 0.7, function(base64){
-      data[currentCat].splice(idx, 0, {name:'新菜品', img:base64});
-      // 限制最多5个
-      if(data[currentCat].length > 5) data[currentCat] = data[currentCat].slice(0,5);
-      renderDishes();
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    compress(f, 600, 0.7, function(b64){
+      db[cur].splice(idx, 0, {name:'新菜品', img:b64});
+      if(db[cur].length > 5) db[cur] = db[cur].slice(0,5);
+      renderList();
       setTimeout(function(){
-        var inp = document.getElementById('dni_'+idx);
-        if(inp){ inp.focus(); inp.select(); }
-      }, 200);
+        var inp2 = document.querySelector('.row[data-idx="'+idx+'"] .ed');
+        if(inp2){ inp2.focus(); inp2.select(); }
+      }, 300);
     });
   };
-  input.click();
+  inp.click();
 }
 
-// 替换图片
 function pickImage(idx){
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = function(e){
-    var file = e.target.files[0];
-    if(!file) return;
-    compress(file, 600, 0.7, function(base64){
-      data[currentCat][idx].img = base64;
-      renderDishes();
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    compress(f, 600, 0.7, function(b64){
+      db[cur][idx].img = b64;
+      renderList();
     });
   };
-  input.click();
+  inp.click();
 }
 
-// 压缩图片
-function compress(file, maxW, quality, cb){
-  var reader = new FileReader();
-  reader.onload = function(e){
+function compress(file, mw, q, cb){
+  var r = new FileReader();
+  r.onload = function(e){
     var img = new Image();
     img.onload = function(){
       var w = img.width, h = img.height;
-      if(w > maxW){ h = h * maxW / w; w = maxW; }
+      if(w > mw){ h = h * mw / w; w = mw; }
       var c = document.createElement('canvas');
       c.width = w; c.height = h;
-      var ctx = c.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      cb(c.toDataURL('image/jpeg', quality));
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(c.toDataURL('image/jpeg', q));
     };
     img.src = e.target.result;
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
 
-// 编辑按钮
-document.getElementById('editBtn').onclick = function(){
-  editMode = !editMode;
-  this.innerHTML = editMode ? '✅ 完成编辑' : '✏️ 编辑';
-  this.className = editMode ? 'btn-edit on' : 'btn-edit';
-  renderDishes();
-};
+function doExport(){
+  var cl = {};
+  for(var i=0;i<CATS.length;i++) cl[CATS[i]] = db[CATS[i]];
+  var j = JSON.stringify(cl);
+  
+  var h = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>🥢 今晚吃什么</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}.p{padding:50px 16px 20px}.p h1{font-size:26px;font-weight:700}.p p{font-size:13px;color:#999;margin:4px 0 18px}.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff;cursor:pointer}.i{font-size:34px;display:block;margin-bottom:8px}.n{font-weight:600;font-size:16px}.s0{background:linear-gradient(135deg,#43b581,#2d8f63)}.s1{background:linear-gradient(135deg,#ff6b35,#e85d2c)}.s2{background:linear-gradient(135deg,#4a90d9,#357abd)}.s3{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}.s4{background:linear-gradient(135deg,#f4a261,#e8924a)}.dp{display:none;padding:0 16px}.dh{padding:50px 0 14px;text-align:center;font-size:19px;font-weight:700;position:relative}.dh .b{position:absolute;left:0;top:50px;width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px;cursor:pointer}.dl{padding-bottom:20px}.dc{background:#fff;border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}.dc img{width:68px;height:68px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f0efed}.dc .t{margin-left:12px;font-size:15px;font-weight:600}.de{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}</style></head><body><div class="p" id="hp"><h1>🥢 今晚吃什么</h1><p id="st"></p><div class="g" id="g"></div></div><div class="dp" id="dp"><div class="dh"><button class="b" id="bk">‹</button><span id="dt"></span></div><div class="dl" id="dl"></div></div><script>var D='+j.replace(/\//g,'\\/')+';var K=Object.keys(D);var I={凉菜:"🥗",热菜:"🍲",汤:"🥣",主食:"🍚",点心:"🥟"};var C={凉菜:"s0",热菜:"s1",汤:"s2",主食:"s3",点心:"s4"};var n=new Date();document.getElementById("st").textContent=n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日 · 共"+K.reduce(function(s,c){return s+D[c].length},0)+"道菜";var g=document.getElementById("g");for(var i=0;i<K.length;i++){var c=K[i];if(D[c].length===0)continue;var d=document.createElement("div");d.className="c "+C[c];d.innerHTML="<span class=\"i\">"+I[c]+"</span><div class=\"n\">"+c+"</div>";d.setAttribute("onclick","openC(\'"+c+"\')");g.appendChild(d)}function openC(c){document.getElementById("dt").textContent=c;var l=document.getElementById("dl");l.innerHTML="";var a=D[c];if(!a.length){l.innerHTML="<div class=\"de\">还没有菜</div>"}else{for(var i=0;i<a.length;i++){var di=document.createElement("div");di.className="dc";di.innerHTML="<img src=\""+a[i].img+"\"><div class=\"t\">"+a[i].name+"</div>";l.appendChild(di)}}document.getElementById("hp").style.display="none";document.getElementById("dp").style.display="block"}document.getElementById("bk").onclick=function(){document.getElementById("dp").style.display="none";document.getElementById("hp").style.display="block"}<\/script></body></html>';
 
-// 保存按钮
-document.getElementById('saveBtn').onclick = function(){
-  // 收集名字
-  for(var i=0;i<data[currentCat].length;i++){
-    var inp = document.getElementById('dni_'+i);
-    if(inp && inp.value.trim()){
-      data[currentCat][i].name = inp.value.trim();
-    }
-  }
-  editMode = false;
-  document.getElementById('editBtn').innerHTML = '✏️ 编辑';
-  document.getElementById('editBtn').className = 'btn-edit';
-  renderDishes();
-  renderHome();
-};
-
-// 返回
-document.getElementById('backBtn').onclick = function(){
-  document.getElementById('detail').style.display = 'none';
-  document.getElementById('home').style.display = 'block';
-  renderHome();
-};
-
-// 编辑菜单（首页）
-document.getElementById('editAllBtn').onclick = function(){
-  openCat(CATS[0]);
-  editMode = true;
-  document.getElementById('editBtn').innerHTML = '✅ 完成编辑';
-  document.getElementById('editBtn').className = 'btn-edit on';
-  renderDishes();
-};
-
-// 导出
-document.getElementById('exportBtn').onclick = function(){
-  var clean = {};
-  for(var i=0;i<CATS.length;i++){
-    clean[CATS[i]] = data[CATS[i]];
-  }
-  var json = JSON.stringify(clean);
-  var html = '<!DOCTYPE html><html lang=\"zh-CN\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no\"><title>🥢 今晚吃什么</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,\"Helvetica Neue\",\"PingFang SC\",sans-serif;background:#f7f5f2;color:#2c2c2c}.p{padding:50px 16px 20px}.p h1{font-size:26px;font-weight:700}.p p{font-size:13px;color:#999;margin:4px 0 18px}.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff;cursor:pointer}.c:active{opacity:.85}.i{font-size:34px;display:block;margin-bottom:8px}.n{font-weight:600;font-size:16px}.s0{background:linear-gradient(135deg,#43b581,#2d8f63)}.s1{background:linear-gradient(135deg,#ff6b35,#e85d2c)}.s2{background:linear-gradient(135deg,#4a90d9,#357abd)}.s3{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}.s4{background:linear-gradient(135deg,#f4a261,#e8924a)}.dp{display:none;padding:0 16px}.dh{padding:50px 0 14px;text-align:center;font-size:19px;font-weight:700;position:relative}.dh .b{position:absolute;left:0;top:50px;width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px;cursor:pointer}.dl{padding-bottom:20px}.dc{background:#fff;border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}.dc img{width:68px;height:68px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f0efed}.dc .t{margin-left:12px;font-size:15px;font-weight:600}.de{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}</style></head><body><div class=\"p\" id=\"hp\"><h1>🥢 今晚吃什么</h1><p id=\"sub\"></p><div class=\"g\" id=\"g\"></div></div><div class=\"dp\" id=\"dp\"><div class=\"dh\"><button class=\"b\" id=\"bk\">‹</button><span id=\"dt\"></span></div><div class=\"dl\" id=\"dl\"></div></div><script>var D='+json.replace(/\//g,'\\/')+';var K=Object.keys(D);var I={凉菜:"🥗",热菜:"🍲",汤:"🥣",主食:"🍚",点心:"🥟"};var C={凉菜:"s0",热菜:"s1",汤:"s2",主食:"s3",点心:"s4"};var n=new Date();document.getElementById("sub").textContent=n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日 · 共"+K.reduce(function(s,c){return s+D[c].length},0)+"道菜";var g=document.getElementById("g");for(var i=0;i<K.length;i++){var c=K[i];if(D[c].length===0)continue;var d=document.createElement("div");d.className="c "+C[c];d.innerHTML="<span class=\"i\">"+I[c]+"</span><div class=\"n\">"+c+"</div><div style=\"font-size:12px;opacity:.7;margin-top:2px\">"+D[c].length+"道菜</div>";d.onclick=function(x){return function(){openC(x)}}(c);g.appendChild(d)}function openC(c){document.getElementById("dt").textContent=c;var l=document.getElementById("dl");l.innerHTML="";var a=D[c];if(a.length===0){l.innerHTML="<div class=\"de\">还没有菜</div>"}else{for(var i=0;i<a.length;i++){var di=document.createElement("div");di.className="dc";di.innerHTML="<img src=\""+a[i].img+"\" alt=\"\"><div class=\"t\">"+a[i].name+"</div>";l.appendChild(di)}}document.getElementById("hp").style.display="none";document.getElementById("dp").style.display="block"}document.getElementById("bk").onclick=function(){document.getElementById("dp").style.display="none";document.getElementById("hp").style.display="block"}<\/script></body></html>';
-
-  var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  var blob = new Blob([h], {type:'text/html;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   var d = new Date();
@@ -292,10 +292,9 @@ document.getElementById('exportBtn').onclick = function(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
-};
+}
 
-// 初始化
-renderHome();
+showHome();
 </script>
 </body>
 </html>
