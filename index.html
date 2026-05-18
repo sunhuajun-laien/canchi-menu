@@ -6,7 +6,7 @@
 <title>聚餐菜单</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c;cursor:pointer}
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}
 #home{padding:50px 16px 30px}
 #home h1{font-size:26px;font-weight:700}
 #home p{font-size:13px;color:#999;margin:4px 0 18px}
@@ -37,7 +37,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC"
 .r .f i{display:none;font-size:15px;font-weight:600;padding:4px 6px;border:1.5px dashed #ff6b35;border-radius:6px;outline:none;width:100%;background:#fffaf5;font-style:normal}
 .r.e .f b{display:none}
 .r.e .f i{display:block}
-.ra{border:2px dashed #ddd;justify-content:center;padding:18px;color:#bbb;font-size:14px;cursor:pointer}
+.ra{border:2px dashed #ddd;justify-content:center;padding:18px;color:#bbb;font-size:14px}
 .em{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}
 .ac{padding:10px 0 25px;display:flex;gap:10px}
 .ac button{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;border:none}
@@ -50,7 +50,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC"
 
 <div id="home">
   <h1>🥢 今晚吃什么</h1>
-  <p>点分类选菜 · 编辑后可保存分享</p>
+  <p>点分类选菜 · 数据自动保存在手机</p>
   <div class="g" id="gl"></div>
   <div class="b">
     <button class="o" onclick="edAll()">✏️ 编辑菜单</button>
@@ -75,13 +75,23 @@ var cs=['凉菜','热菜','汤','主食','点心'];
 var is=['🥗','🍲','🥣','🍚','🥟'];
 var ss=['s0','s1','s2','s3','s4'];
 var ph='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8e6e3%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2236%22%3E🍽%3C/text%3E%3C/svg%3E';
-var db={};for(var i=0;i<cs.length;i++)db[cs[i]]=[];
+
+// 从 localStorage 加载数据
+var db={};
+function loadData(){
+  var saved=localStorage.getItem('menuData');
+  if(saved){try{db=JSON.parse(saved);return;}catch(e){}}
+  for(var i=0;i<cs.length;i++)db[cs[i]]=[];
+}
+function saveData(){localStorage.setItem('menuData',JSON.stringify(db));}
+
+loadData();
 var cur='',ed=false;
 
 function hm(){
   var g=document.getElementById('gl');g.innerHTML='';
   for(var i=0;i<cs.length;i++){
-    var c=cs[i],n=db[c].length;
+    var c=cs[i],n=db[c]?db[c].length:0;
     g.innerHTML+='<div class="'+ss[i]+'" onclick="op(\''+c+'\')"><span class="i">'+is[i]+'</span><div class="n">'+c+'</div><div class="c">'+n+'道菜</div></div>';
   }
 }
@@ -97,10 +107,10 @@ function op(c){
 }
 
 function rd(){
-  var a=document.getElementById('da');var it=db[cur];a.innerHTML='';
+  var a=document.getElementById('da');var it=db[cur]||[];a.innerHTML='';
   if(ed){
     for(var i=0;i<5;i++){
-      if(i<it.length){
+      if(i<it.length&&it[i]&&it[i].name){
         var d=it[i];
         a.innerHTML+='<div class="r r0 e"><div class="p" onclick="pk('+i+')"><img src="'+d.img+'"></div><div class="f"><b>'+esc(d.name)+'</b><i><input type="text" value="'+esc(d.name)+'" maxlength="20" id="ni'+i+'" style="width:100%;border:none;outline:none;background:transparent;font:inherit"></i></div></div>';
       } else {
@@ -108,8 +118,9 @@ function rd(){
       }
     }
   } else {
-    if(it.length===0){a.innerHTML='<div class="em">还没有菜品<br>点击下方「编辑」开始添加</div>';return;}
+    if(!it||it.length===0||!it.some(function(x){return x&&x.name})){a.innerHTML='<div class="em">还没有菜品<br>点击下方「编辑」开始添加</div>';return;}
     for(var i=0;i<it.length;i++){
+      if(!it[i]||!it[i].name)continue;
       var d=it[i];
       a.innerHTML+='<div class="r r0"><div class="p"><img src="'+d.img+'"></div><div class="f"><b>'+esc(d.name)+'</b></div></div>';
     }
@@ -124,8 +135,10 @@ function ad(idx){
   inp.onchange=function(e){
     var f=e.target.files[0];if(!f)return;
     cmp(f,600,0.7,function(b){
+      if(!db[cur])db[cur]=[];
       db[cur].splice(idx,0,{name:'新菜品',img:b});
       if(db[cur].length>5)db[cur]=db[cur].slice(0,5);
+      saveData();
       rd();
       setTimeout(function(){
         var inp2=document.getElementById('ni'+idx);
@@ -141,7 +154,7 @@ function pk(idx){
   inp.type='file';inp.accept='image/*';
   inp.onchange=function(e){
     var f=e.target.files[0];if(!f)return;
-    cmp(f,600,0.7,function(b){db[cur][idx].img=b;rd();});
+    cmp(f,600,0.7,function(b){if(!db[cur])db[cur]=[];db[cur][idx].img=b;saveData();rd();});
   };
   inp.click();
 }
@@ -172,6 +185,7 @@ function togEd(){
 }
 
 function sv(){
+  if(!db[cur])db[cur]=[];
   for(var i=0;i<db[cur].length;i++){
     var inp=document.getElementById('ni'+i);
     if(inp&&inp.value.trim())db[cur][i].name=inp.value.trim();
@@ -179,6 +193,7 @@ function sv(){
   ed=false;
   document.getElementById('ebt').textContent='✏️ 编辑';
   document.getElementById('ebt').className='eb';
+  saveData();
   rd();hm();
 }
 
@@ -191,7 +206,7 @@ function bck(){
 function edAll(){op(cs[0]);ed=true;document.getElementById('ebt').textContent='✅ 完成编辑';document.getElementById('ebt').className='eb on';rd();}
 
 function exp(){
-  var cl={};for(var i=0;i<cs.length;i++)cl[cs[i]]=db[cs[i]];
+  var cl={};for(var i=0;i<cs.length;i++){cl[cs[i]]=(db[cs[i]]||[]).filter(function(x){return x&&x.name;});}
   var j=JSON.stringify(cl);
   var h='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>🥢 今晚吃什么</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}.p{padding:50px 16px 20px}.p h1{font-size:26px;font-weight:700}.p p{font-size:13px;color:#999;margin:4px 0 18px}.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff}.i{font-size:34px;display:block;margin-bottom:8px}.n{font-weight:600;font-size:16px}.s0{background:linear-gradient(135deg,#43b581,#2d8f63)}.s1{background:linear-gradient(135deg,#ff6b35,#e85d2c)}.s2{background:linear-gradient(135deg,#4a90d9,#357abd)}.s3{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}.s4{background:linear-gradient(135deg,#f4a261,#e8924a)}.dp{display:none;padding:0 16px}.dh{padding:50px 0 14px;text-align:center;font-size:19px;font-weight:700;position:relative}.dh .b{position:absolute;left:0;top:50px;width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px}.dl{padding-bottom:20px}.dc{background:#fff;border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}.dc img{width:68px;height:68px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f0efed}.dc .t{margin-left:12px;font-size:15px;font-weight:600}.de{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}</style></head><body><div class="p" id="hp"><h1>🥢 今晚吃什么</h1><p id="st"></p><div class="g" id="g"></div></div><div class="dp" id="dp"><div class="dh"><button class="b" onclick="bc()">‹</button><span id="dt"></span></div><div class="dl" id="dl"></div></div><script>var D='+j.replace(/\//g,'\\/')+';var K=Object.keys(D);var I={凉菜:"🥗",热菜:"🍲",汤:"🥣",主食:"🍚",点心:"🥟"};var C={凉菜:"s0",热菜:"s1",汤:"s2",主食:"s3",点心:"s4"};var n=new Date();document.getElementById("st").textContent=n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日 · 共"+K.reduce(function(s,c){return s+D[c].length},0)+"道菜";var g=document.getElementById("g");for(var i=0;i<K.length;i++){var c=K[i];if(D[c].length===0)continue;g.innerHTML+="<div class=\\"c "+C[c]+"\\" onclick=\\"oc('"+c+"')\\"><span class=\\"i\\">"+I[c]+"</span><div class=\\"n\\">"+c+"</div></div>"}function oc(c){document.getElementById("dt").textContent=c;var l=document.getElementById("dl");l.innerHTML="";var a=D[c];if(!a.length){l.innerHTML="<div class=\\"de\\">还没有菜</div>"}else{for(var i=0;i<a.length;i++){l.innerHTML+="<div class=\\"dc\\"><img src=\\""+a[i].img+"\\"><div class=\\"t\\">"+a[i].name+"</div></div>"}}document.getElementById("hp").style.display="none";document.getElementById("dp").style.display="block"}function bc(){document.getElementById("dp").style.display="none";document.getElementById("hp").style.display="block"}<\/script></body></html>';
   var blob=new Blob([h],{type:'text/html;charset=utf-8'});
