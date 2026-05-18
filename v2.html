@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>聚餐菜单</title><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}
+#home{padding:50px 16px 30px}
+#home h1{font-size:26px;font-weight:700}
+#home p{font-size:13px;color:#999;margin:4px 0 18px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g .cd{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff}
+.g .cd .ic{font-size:34px;display:block;margin-bottom:8px}
+.g .cd .nm{font-weight:600;font-size:16px}
+.g .cd .ct{font-size:12px;opacity:.7;margin-top:2px}
+.s0{background:linear-gradient(135deg,#43b581,#2d8f63)}
+.s1{background:linear-gradient(135deg,#ff6b35,#e85d2c)}
+.s2{background:linear-gradient(135deg,#4a90d9,#357abd)}
+.s3{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}
+.s4{background:linear-gradient(135deg,#f4a261,#e8924a)}
+.b{margin-top:14px;display:flex;gap:10px}
+.b button{flex:1;padding:13px;border-radius:10px;font-size:15px;font-weight:600;border:none}
+.o{background:#ff6b35;color:#fff}
+.d{background:#1a1a1a;color:#fff}
+#det{display:none;padding:0 16px}
+.dh{padding:50px 0 14px;display:flex;align-items:center}
+.dh .bk{width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px}
+.dh .tl{flex:1;text-align:center;font-size:19px;font-weight:700}
+#da{padding-bottom:16px}
+.r{border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center}
+.r0{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.r .p{width:68px;height:68px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#f0efed}
+.r .p img{width:100%;height:100%;object-fit:cover;display:block}
+.r .f{flex:1;margin-left:12px;font-size:15px;font-weight:600}
+.r .f i{display:none;font-size:15px;padding:4px 6px;border:1.5px dashed #ff6b35;border-radius:6px;outline:none;width:100%;background:#fffaf5;font-style:normal}
+.ra{border:2px dashed #ddd;padding:18px;color:#bbb;font-size:14px;cursor:pointer}
+.em{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}
+.ac{padding:10px 0 25px;display:flex;gap:10px}
+.ac button{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;border:none}
+.e2{background:#eee;color:#333}
+.e2.on{background:#ff6b35;color:#fff}
+.sv2{background:#1a1a1a;color:#fff}
+</style></head><body>
+<div id="home">
+<h1>🥢 今晚吃什么</h1>
+<p>点分类选菜 · 编辑后可保存分享</p>
+<div class="g">
+<div class="cd s0" onclick="op('凉菜')"><span class="ic">🥗</span><div class="nm">凉菜</div><div class="ct">0道菜</div></div>
+<div class="cd s1" onclick="op('热菜')"><span class="ic">🍲</span><div class="nm">热菜</div><div class="ct">0道菜</div></div>
+<div class="cd s2" onclick="op('汤')"><span class="ic">🥣</span><div class="nm">汤</div><div class="ct">0道菜</div></div>
+<div class="cd s3" onclick="op('主食')"><span class="ic">🍚</span><div class="nm">主食</div><div class="ct">0道菜</div></div>
+<div class="cd s4" onclick="op('点心')"><span class="ic">🥟</span><div class="nm">点心</div><div class="ct">0道菜</div></div>
+</div>
+<div class="b"><button class="o" onclick="edAll()">✏️ 编辑菜单</button><button class="d" onclick="exp()">📤 保存并分享</button></div>
+</div>
+<div id="det">
+<div class="dh"><button class="bk" onclick="bc()">‹</button><div class="tl" id="dt"></div></div>
+<div id="da"></div>
+<div class="ac"><button class="e2" id="eBtn" onclick="tE()">✏️ 编辑</button><button class="sv2" onclick="sV()">💾 保存</button></div>
+</div>
+<script>
+var D={凉菜:[],热菜:[],汤:[],主食:[],点心:[]};
+var C='',E=false;
+var PH='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8e6e3%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2236%22%3E🍽%3C/text%3E%3C/svg%3E';
+
+function op(c){C=c;E=false;
+document.getElementById('dt').textContent=c;
+document.getElementById('eBtn').textContent='✏️ 编辑';
+document.getElementById('eBtn').className='e2';
+document.getElementById('home').style.display='none';
+document.getElementById('det').style.display='block';rD();}
+
+function rD(){var a=document.getElementById('da'),it=D[C];a.innerHTML='';
+if(E){
+  for(var i=0;i<5;i++){
+    if(i<it.length&&it[i]&&it[i].name){
+      var d=it[i];
+      a.innerHTML+='<div class="r r0"><div class="p" onclick="pI('+i+')"><img src="'+d.img+'"></div><div class="f">'+d.name+'<i><input type="text" value="'+d.name+'" maxlength="20" id="ni'+i+'" style="width:100%;border:none;outline:none;background:transparent;font:inherit"></i></div></div>';
+    } else {
+      a.innerHTML+='<div class="r ra" onclick="aD('+i+')">＋ 点击添加菜品</div>';
+    }
+  }
+} else {
+  if(it.length==0){a.innerHTML='<div class="em">还没有菜品<br>点击下方「编辑」开始添加</div>';return;}
+  for(var i=0;i<it.length;i++){if(!it[i]||!it[i].name)continue;
+    a.innerHTML+='<div class="r r0"><div class="p"><img src="'+it[i].img+'"></div><div class="f">'+it[i].name+'</div></div>';}
+}}
+
+function tE(){E=!E;var b=document.getElementById('eBtn');
+b.textContent=E?'✅ 完成编辑':'✏️ 编辑';
+b.className=E?'e2 on':'e2';rD();}
+
+function sV(){for(var i=0;i<(D[C]||[]).length;i++){
+var n=document.getElementById('ni'+i);if(n&&n.value.trim())D[C][i].name=n.value.trim();}
+E=false;document.getElementById('eBtn').textContent='✏️ 编辑';
+document.getElementById('eBtn').className='e2';rD();hm();}
+
+function bc(){document.getElementById('det').style.display='none';
+document.getElementById('home').style.display='block';hm();}
+
+function hm(){for(var i=0;i<['凉菜','热菜','汤','主食','点心'].length;i++){
+var c=['凉菜','热菜','汤','主食','点心'][i];
+document.querySelectorAll('.g .cd .ct')[i].textContent=(D[c]?D[c].length:0)+'道菜';}}
+
+function aD(idx){var i=document.createElement('input');
+i.type='file';i.accept='image/*';
+i.onchange=function(e){var f=e.target.files[0];if(!f)return;
+var r=new FileReader();r.onload=function(ev){
+var img=new Image();img.onload=function(){
+var w=img.width,h=img.height;if(w>600){h=h*600/w;w=600;}
+var c=document.createElement('canvas');c.width=w;c.height=h;
+c.getContext('2d').drawImage(img,0,0,w,h);
+var b=c.toDataURL('image/jpeg',0.7);
+if(!D[C])D[C]=[];D[C].splice(idx,0,{name:'新菜品',img:b});
+if(D[C].length>5)D[C]=D[C].slice(0,5);rD();
+setTimeout(function(){var x=document.getElementById('ni'+idx);if(x){x.focus();x.select();}},300);
+};img.src=ev.target.result;};r.readAsDataURL(f);};i.click();}
+
+function pI(idx){var i=document.createElement('input');
+i.type='file';i.accept='image/*';
+i.onchange=function(e){var f=e.target.files[0];if(!f)return;
+var r=new FileReader();r.onload=function(ev){
+var img=new Image();img.onload=function(){
+var w=img.width,h=img.height;if(w>600){h=h*600/w;w=600;}
+var c=document.createElement('canvas');c.width=w;c.height=h;
+c.getContext('2d').drawImage(img,0,0,w,h);
+D[C][idx].img=c.toDataURL('image/jpeg',0.7);rD();
+};img.src=ev.target.result;};r.readAsDataURL(f);};i.click();}
+
+function edAll(){op('凉菜');E=true;
+document.getElementById('eBtn').textContent='✅ 完成编辑';
+document.getElementById('eBtn').className='e2 on';rD();}
+
+function exp(){
+var cl={};for(var i=0;i<['凉菜','热菜','汤','主食','点心'].length;i++){
+var c=['凉菜','热菜','汤','主食','点心'][i];
+cl[c]=(D[c]||[]).filter(function(x){return x&&x.name;});}
+var j=JSON.stringify(cl);
+var h='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>🥢 今晚吃什么</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}.p{padding:50px 16px 20px}.p h1{font-size:26px;font-weight:700}.p p{font-size:13px;color:#999;margin:4px 0 18px}.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c{padding:22px 10px 16px;border-radius:14px;text-align:center;color:#fff}.i{font-size:34px;display:block;margin-bottom:8px}.n{font-weight:600;font-size:16px}.s0{background:linear-gradient(135deg,#43b581,#2d8f63)}.s1{background:linear-gradient(135deg,#ff6b35,#e85d2c)}.s2{background:linear-gradient(135deg,#4a90d9,#357abd)}.s3{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}.s4{background:linear-gradient(135deg,#f4a261,#e8924a)}.dp{display:none;padding:0 16px}.dh{padding:50px 0 14px;text-align:center;font-size:19px;font-weight:700;position:relative}.dh .b{position:absolute;left:0;top:50px;width:34px;height:34px;border-radius:50%;background:#eee;border:none;font-size:20px}.dl{padding-bottom:20px}.dc{background:#fff;border-radius:12px;margin-bottom:10px;padding:10px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}.dc img{width:68px;height:68px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f0efed}.dc .t{margin-left:12px;font-size:15px;font-weight:600}.de{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}</style></head><body><div class="p" id="hp"><h1>🥢 今晚吃什么</h1><p id="st"></p><div class="g" id="g"></div></div><div class="dp" id="dp"><div class="dh"><button class="b" onclick="bc()">‹</button><span id="dt"></span></div><div class="dl" id="dl"></div></div><script>var D='+j.replace(/\//g,'\\/')+';var K=Object.keys(D);var I={凉菜:"🥗",热菜:"🍲",汤:"🥣",主食:"🍚",点心:"🥟"};var C={凉菜:"s0",热菜:"s1",汤:"s2",主食:"s3",点心:"s4"};var n=new Date();document.getElementById("st").textContent=n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日";var g=document.getElementById("g");for(var i=0;i<K.length;i++){var c=K[i];if(D[c].length===0)continue;g.innerHTML+="<div class=\\"c "+C[c]+"\\" onclick=\\"oc('"+c+"')\\"><span class=\\"i\\">"+I[c]+"</span><div class=\\"n\\">"+c+"</div></div>"}function oc(c){document.getElementById("dt").textContent=c;var l=document.getElementById("dl");l.innerHTML="";var a=D[c];if(!a.length){l.innerHTML="<div class=\\"de\\">还没有菜</div>"}else{for(var i=0;i<a.length;i++){l.innerHTML+="<div class=\\"dc\\"><img src=\\""+a[i].img+"\\"><div class=\\"t\\">"+a[i].name+"</div></div>"}}document.getElementById("hp").style.display="none";document.getElementById("dp").style.display="block"}function bc(){document.getElementById("dp").style.display="none";document.getElementById("hp").style.display="block"}<\/script></body></html>';
+var blob=new Blob([h],{type:'text/html;charset=utf-8'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+var d=new Date();a.download='聚餐菜单_'+d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()+'.html';
+document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+
+hm();
+</script></body></html>
