@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>聚餐菜单 · 今晚吃什么</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c;min-height:100vh}
+
+  /* ===== 首页 ===== */
+  #page-home{display:flex;flex-direction:column;min-height:100vh;padding:0 20px}
+  .home-header{padding-top:60px;padding-bottom:30px}
+  .home-header h1{font-size:28px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px}
+  .home-header p{font-size:14px;color:#8e8e93;margin-top:6px}
+  .home-header .mode-btn{display:inline-block;margin-top:16px;padding:6px 16px;border-radius:18px;font-size:13px;border:1.5px solid #c8c8cc;color:#8e8e93;background:transparent;cursor:pointer;transition:.2s}
+  .home-header .mode-btn.active{border-color:#ff6b35;color:#ff6b35;background:#fff5f0}
+
+  .category-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:40px}
+  .cat-card{border-radius:16px;padding:28px 18px 22px;text-align:center;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden}
+  .cat-card:active{transform:scale(0.96)}
+  .cat-card .icon{font-size:40px;margin-bottom:12px;display:block}
+  .cat-card .name{font-size:18px;font-weight:600;color:#fff}
+  .cat-card .count{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+  .cat-凉菜{background:linear-gradient(135deg,#43b581,#2d8f63)}
+  .cat-热菜{background:linear-gradient(135deg,#ff6b35,#e85d2c)}
+  .cat-汤  {background:linear-gradient(135deg,#4a90d9,#357abd)}
+  .cat-主食{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}
+  .cat-点心{background:linear-gradient(135deg,#f4a261,#e8924a)}
+
+  /* ===== 分类详情页 ===== */
+  .page-detail{display:none;flex-direction:column;min-height:100vh;padding:0 16px}
+  .detail-header{display:flex;align-items:center;padding:52px 0 18px;position:relative}
+  .back-btn{width:36px;height:36px;border-radius:50%;background:#f0efed;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;color:#2c2c2c;transition:.15s}
+  .back-btn:active{background:#e0dfdd}
+  .detail-header h2{flex:1;text-align:center;font-size:20px;font-weight:700;margin-right:36px}
+
+  .dish-list{padding-bottom:30px;flex:1}
+
+  /* 菜品卡片 - 有内容 */
+  .dish-item{background:#fff;border-radius:14px;margin-bottom:12px;overflow:hidden;display:flex;align-items:center;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .dish-img-wrap{width:72px;height:72px;border-radius:10px;overflow:hidden;flex-shrink:0;position:relative;background:#f0efed;cursor:default}
+  .dish-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .dish-img-wrap .edit-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;color:#fff;font-size:12px;border-radius:10px}
+  .dish-item.editing .edit-overlay{display:flex}
+  .dish-info{flex:1;margin-left:14px}
+  .dish-name{font-size:16px;font-weight:600;color:#1a1a1a;padding:2px 0}
+  .dish-name-edit{display:none;font-size:16px;font-weight:600;padding:4px 8px;border:1.5px dashed #ff6b35;border-radius:6px;outline:none;width:100%;background:#fffaf5;color:#1a1a1a}
+  .dish-item.editing .dish-name{display:none}
+  .dish-item.editing .dish-name-edit{display:block}
+
+  /* 空位 - 添加菜品 */
+  .dish-add{background:#fff;border-radius:14px;margin-bottom:12px;display:flex;align-items:center;padding:10px;border:2px dashed #d1cfcd;cursor:pointer;transition:.15s}
+  .dish-add:active{background:#f5f3f0;border-color:#ff6b35}
+  .dish-add-icon{width:72px;height:72px;border-radius:10px;background:#f5f3f0;display:flex;align-items:center;justify-content:center;font-size:28px;color:#c8c8cc;flex-shrink:0}
+  .dish-add-text{flex:1;margin-left:14px;font-size:14px;color:#c8c8cc;font-weight:500}
+
+  .dish-empty{text-align:center;padding:60px 20px;color:#c8c8cc;font-size:14px}
+
+  /* ===== 底部栏 ===== */
+  .detail-footer{padding:12px 0 30px;display:flex;gap:10px}
+  .detail-footer button{flex:1;padding:12px;border-radius:12px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:.15s}
+  .detail-footer button:active{transform:scale(0.97)}
+  .btn-edit{background:#f0efed;color:#2c2c2c}
+  .btn-edit.active{background:#ff6b35;color:#fff}
+  .btn-save{background:#1a1a1a;color:#fff}
+
+  /* ===== 首页底部保存 ===== */
+  .home-footer{padding:10px 0 30px}
+  .home-footer .btn-export{width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:600;border:none;background:#1a1a1a;color:#fff;cursor:pointer;transition:.15s}
+  .home-footer .btn-export:active{transform:scale(0.97)}
+
+  /* ===== Toast ===== */
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ========== 首页 ========== -->
+<div id="page-home">
+  <div class="home-header">
+    <h1>🥢 今晚吃什么</h1>
+    <p>点分类选菜 · 完成编辑后可保存分享</p>
+    <button class="mode-btn" id="globalEditToggle">✏️ 编辑菜单</button>
+  </div>
+  <div class="category-grid" id="categoryGrid"></div>
+  <div class="home-footer">
+    <button class="btn-export" id="exportBtn">📤 保存并分享菜单</button>
+  </div>
+</div>
+
+<!-- ========== 分类详情页 ========== -->
+<div class="page-detail" id="pageDetail">
+  <div class="detail-header">
+    <button class="back-btn" id="backBtn">‹</button>
+    <h2 id="detailTitle">凉菜</h2>
+  </div>
+  <div class="dish-list" id="dishList"></div>
+  <div class="detail-footer">
+    <button class="btn-edit" id="editToggle">✏️ 编辑</button>
+    <button class="btn-save" id="saveBtn">💾 保存</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==============================
+//  数据
+// ==============================
+const CATEGORIES = ['凉菜','热菜','汤','主食','点心'];
+const CAT_ICONS = {凉菜:'🥗',热菜:'🍲',汤:'🥣',主食:'🍚',点心:'🥟'};
+const PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8e6e3%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2256%22 text-anchor=%22middle%22 font-size=%2236%22%3E🍽%3C/text%3E%3C/svg%3E';
+
+let data = {};
+let editing = false;
+let currentCategory = '';
+
+CATEGORIES.forEach(c => {
+  data[c] = Array(5).fill(null).map(() => ({name:'', img:PLACEHOLDER}));
+});
+
+// ==============================
+//  首页
+// ==============================
+function renderHome(){
+  const grid = document.getElementById('categoryGrid');
+  grid.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const count = data[c].filter(d => d.name).length;
+    const card = document.createElement('div');
+    card.className = `cat-card cat-${c}`;
+    card.innerHTML = `<span class="icon">${CAT_ICONS[c]}</span>
+      <div class="name">${c}</div>
+      <div class="count">${count}道菜</div>`;
+    card.onclick = () => openCategory(c);
+    grid.appendChild(card);
+  });
+}
+
+// ==============================
+//  详情页
+// ==============================
+function openCategory(cat){
+  currentCategory = cat;
+  editing = false;
+  document.getElementById('detailTitle').textContent = cat;
+  document.getElementById('editToggle').textContent = '✏️ 编辑';
+  document.getElementById('editToggle').classList.remove('active');
+  renderDishList();
+  document.getElementById('pageHome').style.display = 'none';
+  document.getElementById('pageDetail').style.display = 'flex';
+}
+
+function renderDishList(){
+  const list = document.getElementById('dishList');
+  const items = data[currentCategory];
+  list.innerHTML = '';
+
+  if(editing){
+    // —— 编辑模式：显示全部5个位置（有内容+空位） ——
+    items.forEach((dish, i) => {
+      if(dish.name){
+        // 已有菜品 → 可编辑
+        const div = document.createElement('div');
+        div.className = 'dish-item editing';
+        div.innerHTML = `
+          <div class="dish-img-wrap" style="cursor:pointer">
+            <img src="${dish.img}" alt="${dish.name}">
+            <div class="edit-overlay">点此换图</div>
+          </div>
+          <div class="dish-info">
+            <div class="dish-name">${escapeHtml(dish.name)}</div>
+            <input class="dish-name-edit" type="text" value="${escapeHtml(dish.name)}" maxlength="20" data-idx="${i}">
+          </div>`;
+        div.querySelector('.dish-img-wrap').onclick = () => uploadImage(i);
+        list.appendChild(div);
+      } else {
+        // 空位 → 显示添加按钮
+        const add = document.createElement('div');
+        add.className = 'dish-add';
+        add.innerHTML = `<div class="dish-add-icon">＋</div>
+          <div class="dish-add-text">点击添加菜品</div>`;
+        add.onclick = () => addDish(i);
+        list.appendChild(add);
+      }
+    });
+  } else {
+    // —— 浏览模式：只显示有内容的 ——
+    const filled = items.filter(d => d.name);
+    if(filled.length === 0){
+      list.innerHTML = `<div class="dish-empty">还没有添加菜品<br>点击下方「编辑」开始添加</div>`;
+      return;
+    }
+    filled.forEach((dish, i) => {
+      // 注意这里的 i 是 filled 数组的索引，需要找到原始索引来保持稳定
+      const origIdx = items.findIndex((d,idx) => d.name && idx >= (i>0 ? items.findIndex((d2,idx2)=>d2.name && idx2 > filled[i-1]._idx) : -1));
+      // 更简单：给数据加标记
+      const div = document.createElement('div');
+      div.className = 'dish-item';
+      div.innerHTML = `
+        <div class="dish-img-wrap">
+          <img src="${dish.img}" alt="${dish.name}">
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">${escapeHtml(dish.name)}</div>
+        </div>`;
+      list.appendChild(div);
+    });
+  }
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ==============================
+//  添加新菜品
+// ==============================
+function addDish(index){
+  // 先选图
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    compressImage(file, 800, 0.7, base64 => {
+      data[currentCategory][index].img = base64;
+      data[currentCategory][index].name = '新菜品';
+      renderDishList();
+      // 自动聚焦到名字输入框
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.dish-name-edit');
+        const last = inputs[inputs.length-1];
+        if(last) { last.focus(); last.select(); }
+      }, 100);
+      showToast('图片已添加，输入菜名吧 ✏️');
+    });
+  };
+  fileInput.click();
+}
+
+// ==============================
+//  上传图片（替换）
+// ==============================
+function uploadImage(index){
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    compressImage(file, 800, 0.7, base64 => {
+      data[currentCategory][index].img = base64;
+      renderDishList();
+      showToast('图片已更新 ✅');
+    });
+  };
+  fileInput.click();
+}
+
+function compressImage(file, maxW, quality, cb){
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = h * maxW / w; w = maxW; }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      cb(c.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==============================
+//  编辑按钮
+// ==============================
+document.getElementById('editToggle').onclick = function(){
+  editing = !editing;
+  this.textContent = editing ? '✅ 完成编辑' : '✏️ 编辑';
+  this.classList.toggle('active');
+  renderDishList();
+};
+
+// ==============================
+//  保存按钮（保存当前分类修改）
+// ==============================
+document.getElementById('saveBtn').onclick = function(){
+  // 收集所有输入框的值
+  const inputs = document.querySelectorAll('.dish-name-edit');
+  inputs.forEach(inp => {
+    const idx = parseInt(inp.dataset.idx);
+    if(!isNaN(idx) && inp.value.trim()){
+      data[currentCategory][idx].name = inp.value.trim();
+    } else if(!isNaN(idx) && !inp.value.trim()){
+      // 如果用户把名字删空了，删除这道菜
+      data[currentCategory][idx].name = '';
+      data[currentCategory][idx].img = PLACEHOLDER;
+    }
+  });
+  editing = false;
+  document.getElementById('editToggle').textContent = '✏️ 编辑';
+  document.getElementById('editToggle').classList.remove('active');
+  renderDishList();
+  renderHome();
+  showToast('已保存 ✅');
+};
+
+// ==============================
+//  返回首页
+// ==============================
+document.getElementById('backBtn').onclick = function(){
+  document.getElementById('pageDetail').style.display = 'none';
+  document.getElementById('pageHome').style.display = 'flex';
+  renderHome();
+};
+
+// ==============================
+//  全局编辑模式
+// ==============================
+document.getElementById('globalEditToggle').onclick = function(){
+  // 直接打开第一个分类进入编辑模式
+  openCategory(CATEGORIES[0]);
+  editing = true;
+  document.getElementById('editToggle').textContent = '✅ 完成编辑';
+  document.getElementById('editToggle').classList.add('active');
+  renderDishList();
+  showToast('点击「＋」添加菜品');
+};
+
+// ==============================
+//  导出
+// ==============================
+document.getElementById('exportBtn').onclick = exportHTML;
+
+function exportHTML(){
+  const cleanData = {};
+  CATEGORIES.forEach(c => {
+    cleanData[c] = data[c].filter(d => d.name).map(d => ({name:d.name, img:d.img}));
+  });
+  const dataJson = JSON.stringify(cleanData);
+
+  const html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>🥢 今晚吃什么</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;background:#f7f5f2;color:#2c2c2c}
+.page{display:flex;flex-direction:column;min-height:100vh;padding:0 16px}
+.header{padding-top:52px;padding-bottom:20px;text-align:center}
+.header h1{font-size:26px;font-weight:700}
+.header p{font-size:13px;color:#8e8e93;margin-top:4px}
+.grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:20px}
+.card{border-radius:14px;padding:24px 14px 18px;text-align:center;color:#fff;cursor:pointer;transition:.15s}
+.card:active{transform:scale(0.96)}
+.card .icon{font-size:36px;display:block;margin-bottom:10px}
+.card .name{font-size:17px;font-weight:600}
+.card .count{font-size:12px;opacity:.7;margin-top:3px}
+.c-凉菜{background:linear-gradient(135deg,#43b581,#2d8f63)}
+.c-热菜{background:linear-gradient(135deg,#ff6b35,#e85d2c)}
+.c-汤  {background:linear-gradient(135deg,#4a90d9,#357abd)}
+.c-主食{background:linear-gradient(135deg,#9b8ec9,#7b6faf)}
+.c-点心{background:linear-gradient(135deg,#f4a261,#e8924a)}
+.detail{display:none;flex-direction:column;min-height:100vh;padding:0 16px}
+.dh{padding:52px 0 18px;text-align:center;font-size:20px;font-weight:700;position:relative}
+.dh .bk{position:absolute;left:0;top:52px;width:36px;height:36px;border-radius:50%;background:#f0efed;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;transition:.15s}
+.dh .bk:active{background:#e0dfdd}
+.dl{padding-bottom:30px;flex:1}
+.di{background:#fff;border-radius:14px;margin-bottom:12px;display:flex;align-items:center;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.di img{width:72px;height:72px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f0efed}
+.di .in{margin-left:14px;font-size:16px;font-weight:600;color:#1a1a1a}
+.de{text-align:center;padding:60px 20px;color:#c8c8cc;font-size:14px}
+</style>
+</head>
+<body>
+<div class="page" id="hp">
+  <div class="header">
+    <h1>🥢 今晚吃什么</h1>
+    <p id="subtitle"></p>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="detail" id="dp">
+  <div class="dh"><button class="bk" id="bk">‹</button><span id="dt"></span></div>
+  <div class="dl" id="dl"></div>
+</div>
+<script>
+const DATA = ${dataJson};
+const CATS = Object.keys(DATA);
+const ICONS = {凉菜:'🥗',热菜:'🍲',汤:'🥣',主食:'🍚',点心:'🥟'};
+const now = new Date();
+document.getElementById('subtitle').textContent = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 · 共'+CATS.reduce((s,c)=>s+DATA[c].length,0)+'道菜';
+const g=document.getElementById('grid');
+CATS.forEach(c=>{
+  const n=DATA[c].length;
+  if(n===0) return;
+  const d=document.createElement('div');
+  d.className='card c-'+c;
+  d.innerHTML='<span class="icon">'+ICONS[c]+'</span><div class="name">'+c+'</div><div class="count">'+n+'道菜</div>';
+  d.onclick=()=>openC(c);
+  g.appendChild(d);
+});
+function openC(c){
+  document.getElementById('dt').textContent=c;
+  const l=document.getElementById('dl');l.innerHTML='';
+  const a=DATA[c];
+  if(!a.length){l.innerHTML='<div class="de">这个分类还没有菜</div>';}
+  else{a.forEach(d=>{
+    const di=document.createElement('div');di.className='di';
+    di.innerHTML='<img src="'+d.img+'" alt="'+d.name+'"><div class="in">'+d.name+'</div>';
+    l.appendChild(di);
+  });}
+  document.getElementById('hp').style.display='none';
+  document.getElementById('dp').style.display='flex';
+}
+document.getElementById('bk').onclick=()=>{
+  document.getElementById('dp').style.display='none';
+  document.getElementById('hp').style.display='flex';
+};
+<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const now = new Date();
+  const dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  a.download = '聚餐菜单_'+dateStr+'.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  showToast('菜单已生成 ✅ 微信分享给朋友吧');
+}
+
+// ==============================
+//  Toast
+// ==============================
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==============================
+//  初始化
+// ==============================
+renderHome();
+</script>
+</body>
+</html>
